@@ -1,0 +1,8 @@
+The path_provider package provides a platform-agnostic way to access commonly used locations on the device’s
+file system. The plugin currently supports access to two file system locations:
+
+Temporary directory (cache): that the system can clear at any time. On iOS, this corresponds to the
+NSCachesDirectory. On Android, this is the value that getCacheDir() returns.
+Documents directory: for the app to store files that only it can access. The system clears the directory
+only when the app is deleted. On iOS, this corresponds to the NSDocumentDirectory. On Android, this is
+the AppData directory.
