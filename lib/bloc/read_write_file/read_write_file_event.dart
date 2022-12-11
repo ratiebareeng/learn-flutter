@@ -1,25 +1,21 @@
-import 'dart:io';
+part of 'read_write_file_bloc.dart';
 
-import 'package:equatable/equatable.dart';
-
-/// events or actions the page can perform
-abstract class HomeEvent extends Equatable {
-  const HomeEvent();
-}
-
-class FetchDataEvent extends HomeEvent {
-  @override
-  List<Object?> get props => [];
+/// get document directory path
+/// get reference to document in directory
+/// write to to file
+/// read from file
+abstract class ReadWriteFileEvent extends Equatable {
+  const ReadWriteFileEvent();
 }
 
 /// get documents directory
-class GetDocumentsDirectoryEvent extends HomeEvent {
+class GetDocumentsDirectoryEvent extends ReadWriteFileEvent {
   @override
   List<Object?> get props => [];
 }
 
 /// get reference to file in documents directory
-class GetFileRefFromDocsDirEvent extends HomeEvent {
+class GetFileRefFromDocsDirEvent extends ReadWriteFileEvent {
   final String fileName, fileExtension, documentsDirectory;
 
   const GetFileRefFromDocsDirEvent(
@@ -31,19 +27,18 @@ class GetFileRefFromDocsDirEvent extends HomeEvent {
 }
 
 /// write to file
-class WriteToFileEvent extends HomeEvent {
+class WriteToFileEvent extends ReadWriteFileEvent {
   final File file;
   final String stringToWrite;
 
   const WriteToFileEvent({required this.file, required this.stringToWrite});
 
   @override
-  // TODO: implement props
   List<Object?> get props => [file, stringToWrite];
 }
 
 /// read from file
-class ReadFromFileEvent extends HomeEvent {
+class ReadFromFileEvent extends ReadWriteFileEvent {
   final File file;
 
   const ReadFromFileEvent({
@@ -51,12 +46,5 @@ class ReadFromFileEvent extends HomeEvent {
   });
 
   @override
-  // TODO: implement props
   List<Object?> get props => [file];
-}
-
-/// reset
-class ResetStateEvent extends HomeEvent {
-  @override
-  List<Object?> get props => [];
 }

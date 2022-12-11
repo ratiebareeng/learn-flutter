@@ -1,13 +1,11 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:test_bloc_flutter/FoodGenerator.dart';
-import 'package:test_bloc_flutter/bloc/home_event.dart';
-import 'package:test_bloc_flutter/bloc/home_state.dart';
 
-import '../model/food.dart';
+import '../../model/food.dart';
+import 'home_event.dart';
+import 'home_state.dart';
 
 /// provide initial state via super constructor
 /// in this case it's an empty homeinitialstate
@@ -21,66 +19,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     /// reset data back to initial state
     on<ResetStateEvent>(_resetData);
-
-    /// get documents directory
-    on<GetDocumentsDirectoryEvent>(_getDocumentsDirectory);
-
-    /// get reference to file in docs directory
-    on<GetFileRefFromDocsDirEvent>(_getFileRefFromDocsDir);
-
-    /// write data to file
-    on<WriteToFileEvent>(_writeToFile);
-
-    /// read data from file
-    on<ReadFromFileEvent>(_readFromFile);
-  }
-
-  void _writeToFile(
-    WriteToFileEvent event,
-    Emitter<HomeState> emitter,
-  ) async {
-    // read file
-    //event.file.
-    await event.file
-        .writeAsString(event.stringToWrite, mode: FileMode.append)
-        .catchError((error) {
-      emitter(ErrorWriteDataToFile(errorMessage: error.toString()));
-    });
-    emitter(SuccessWriteDataToFile(file: event.file));
-  }
-
-  void _readFromFile(
-    ReadFromFileEvent event,
-    Emitter<HomeState> emitter,
-  ) async {
-    // read file
-    String contents = await event.file.readAsString().catchError((error) {
-      emitter(ErrorReadFromFile(errorMessage: error.toString()));
-    });
-    emitter(SuccessReadFromFile(contents: contents));
-  }
-
-  void _getFileRefFromDocsDir(
-    GetFileRefFromDocsDirEvent event,
-    Emitter<HomeState> emitter,
-  ) async {
-    final path = event.documentsDirectory;
-    emitter(SuccessCreateFileInDocsDirState(
-        file: File('$path/${event.fileName}.${event.fileExtension}')));
-  }
-
-  void _getDocumentsDirectory(
-    GetDocumentsDirectoryEvent event,
-    Emitter<HomeState> emitter,
-  ) async {
-    emitter(const HomeLoadingState());
-    try {
-      final Directory directory = await getApplicationDocumentsDirectory();
-
-      emitter(HomeSuccessfulGetDocsDirState(path: directory.path));
-    } on MissingPlatformDirectoryException catch (e) {
-      emitter(ErrorGetDocsDirState(errorMessage: e.message));
-    }
   }
 
   void _resetData(

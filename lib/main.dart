@@ -2,18 +2,20 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bloc_manager/blocs/blocs.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:settings_manager/controller/settings_controller.dart';
-import 'package:test_bloc_flutter/bloc/home_bloc.dart';
-import 'package:test_bloc_flutter/bloc/home_event.dart';
-import 'package:test_bloc_flutter/bloc/home_state.dart';
+import 'package:test_bloc_flutter/bloc/home_bloc/home_bloc.dart';
+import 'package:test_bloc_flutter/bloc/home_bloc/home_event.dart';
+import 'package:test_bloc_flutter/bloc/home_bloc/home_state.dart';
 import 'package:test_bloc_flutter/log_settings.dart';
 import 'package:test_bloc_flutter/show_side.dart';
 import 'package:tft_theme/tft_theme.dart';
 import 'package:tft_widgets/tft_application/tft_application_widget.dart';
 
+import 'bloc/read_write_file/read_write_file_bloc.dart';
 import 'model/food.dart';
 
 void main() {
@@ -24,21 +26,12 @@ void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => HomeBloc(),
-        ),
-        BlocProvider(
-          create: (context) => ApplicationBloc.instance,
-        ),
-        BlocProvider(
-          create: (context) => CaptureFingerprintBloc.instance,
-        ),
-        BlocProvider(
-          create: (context) => CapturePhotoBloc.instance,
-        ),
-        BlocProvider(
-          create: (context) => CaptureSignatureBloc.instance,
-        ),
+        BlocProvider(create: (context) => HomeBloc()),
+        BlocProvider(create: (context) => ReadWriteFileBloc()),
+        BlocProvider(create: (context) => ApplicationBloc.instance),
+        BlocProvider(create: (context) => CaptureFingerprintBloc.instance),
+        BlocProvider(create: (context) => CapturePhotoBloc.instance),
+        BlocProvider(create: (context) => CaptureSignatureBloc.instance),
       ],
       child: const HomeSreen(),
     ),
@@ -54,11 +47,13 @@ class HomeSreen extends StatefulWidget {
 
 class _HomeSreenState extends State<HomeSreen> {
   late HomeBloc homeBloc;
+  late ReadWriteFileBloc readWriteFileBloc;
 
   @override
   void initState() {
     super.initState();
     homeBloc = context.read<HomeBloc>();
+    readWriteFileBloc = context.read<ReadWriteFileBloc>();
   }
 
   Widget _fetchDataButton() {
@@ -164,86 +159,104 @@ class _HomeSreenState extends State<HomeSreen> {
                 icon: const Icon(Icons.refresh)),
           ],
         ),
-        body: BlocConsumer<HomeBloc, HomeState>(
-          /// called everytime state changes but does not return widget
-          /// place side effects here ex show alerts, snackbars, hit trackers
-          listener: (context, state) {},
+        body: Column(
+          children: [
+            const Text('Load Data from API'),
+            BlocConsumer<HomeBloc, HomeState>(
+              /// called everytime state changes but does not return widget
+              /// place side effects here ex show alerts, snackbars, hit trackers
+              listener: (context, state) {},
 
-          /// called everytime state changes
-          builder: (context, state) {
-            /// list all possible states and define their UI
-            if (state is HomeLoadingState) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is HomeSuccessFetchDataState) {
-              return Center(
-                child: ListView.builder(
-                  itemCount: state.foods.length,
-                  itemBuilder: (context, index) =>
-                      _buildFoodCard(state.foods[index]),
-                ),
-              );
-            }
-            if (state is HomeErrorFetchDataState) {
-              return _successWidget(
-                  textToDisplay: state.errorMessage,
-                  sibling: _fetchDataButton());
-            }
+              /// called everytime state changes
+              builder: (context, state) {
+                /// list all possible states and define their UI
+                if (state is HomeLoadingState) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is HomeSuccessFetchDataState) {
+                  return Center(
+                    child: ListView.builder(
+                      itemCount: state.foods.length,
+                      itemBuilder: (context, index) =>
+                          _buildFoodCard(state.foods[index]),
+                    ),
+                  );
+                }
+                if (state is HomeErrorFetchDataState) {
+                  return _successWidget(
+                      textToDisplay: state.errorMessage,
+                      sibling: _fetchDataButton());
+                }
 
-            if (state is ErrorGetDocsDirState) {
-              return _successWidget(
-                  textToDisplay: state.errorMessage,
-                  sibling: _getDocsDirButton());
-            }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _fetchDataButton(),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ShowSide()));
+                      },
+                      child: const Text('SideMenu'),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const Text('Read Write File'),
+            BlocConsumer<ReadWriteFileBloc, ReadWriteFileState>(
+              builder: (context, state) {
+                /* if (state is ReadWriteFileInitial) {
+                  return const Center(child: CircularProgressIndicator());
+                }*/
+                if (state is ErrorGetDocsDirState) {
+                  return _successWidget(
+                      textToDisplay: state.errorMessage,
+                      sibling: _getDocsDirButton());
+                }
 
-            if (state is HomeSuccessfulGetDocsDirState) {
-              return _successWidget(
-                  textToDisplay: state.path,
-                  sibling: _getFileRefButton(state.path));
-            }
+                if (state is HomeSuccessfulGetDocsDirState) {
+                  return _successWidget(
+                      textToDisplay: state.path,
+                      sibling: _getFileRefButton(state.path));
+                }
 
-            if (state is SuccessCreateFileInDocsDirState) {
-              return _successWidget(
-                  textToDisplay: state.file.path,
-                  sibling: _writeToFile(file: state.file));
-            }
+                if (state is SuccessCreateFileInDocsDirState) {
+                  return _successWidget(
+                      textToDisplay: state.file.path,
+                      sibling: _writeToFile(file: state.file));
+                }
 
-            if (state is SuccessWriteDataToFile) {
-              return _successWidget(
-                  textToDisplay: 'File Updated',
-                  sibling: _readFromFile(file: state.file));
-            }
+                if (state is SuccessWriteDataToFile) {
+                  return _successWidget(
+                      textToDisplay: 'File Updated',
+                      sibling: _readFromFile(file: state.file));
+                }
 
-            if (state is SuccessReadFromFile) {
-              return _successWidget(
-                textToDisplay: state.contents,
-              );
-            }
+                if (state is SuccessReadFromFile) {
+                  return _successWidget(
+                    textToDisplay: state.contents,
+                  );
+                }
 
-            if (state is ErrorCreateFileInDocsDirState) {
-              return _successWidget(textToDisplay: state.errorMessage);
-            }
-
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _fetchDataButton(),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ShowSide()));
-                  },
-                  child: const Text('SideMenu'),
-                ),
-                _getDocsDirButton(),
-                _readFromFile(
-                    file: File(
-                        '/data/user/0/com.example.test_bloc_flutter/app_flutter/my_counter.txt')),
-              ],
-            );
-          },
+                if (state is ErrorCreateFileInDocsDirState) {
+                  return _successWidget(textToDisplay: state.errorMessage);
+                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _getDocsDirButton(),
+                    _readFromFile(
+                        file: File(
+                            '/data/user/0/com.example.test_bloc_flutter/app_flutter/my_counter.txt')),
+                  ],
+                );
+              },
+              listener: (context, state) {},
+            ),
+          ],
         ),
       ),
     );
@@ -263,30 +276,34 @@ class _HomeSreenState extends State<HomeSreen> {
   }
 
   Widget _getDocsDirButton() {
-    return TextButton(
-      onPressed: () {
-        homeBloc.add(GetDocumentsDirectoryEvent());
-      },
-      child: const Text('Get Document Directory'),
-    );
+    return kIsWeb
+        ? Container()
+        : TextButton(
+            onPressed: () {
+              readWriteFileBloc.add(GetDocumentsDirectoryEvent());
+            },
+            child: const Text('Get Document Directory'),
+          );
   }
 
   Widget _getFileRefButton(String docsPath) {
-    return TextButton(
-      onPressed: () {
-        homeBloc.add(GetFileRefFromDocsDirEvent(
-            documentsDirectory: docsPath,
-            fileName: 'my_counter',
-            fileExtension: 'txt'));
-      },
-      child: const Text('Get File Reference'),
-    );
+    return kIsWeb
+        ? Container()
+        : TextButton(
+            onPressed: () {
+              readWriteFileBloc.add(GetFileRefFromDocsDirEvent(
+                  documentsDirectory: docsPath,
+                  fileName: 'my_counter',
+                  fileExtension: 'txt'));
+            },
+            child: const Text('Get File Reference'),
+          );
   }
 
   Widget _writeToFile({required File file}) {
     return TextButton(
       onPressed: () {
-        homeBloc.add(
+        readWriteFileBloc.add(
             WriteToFileEvent(file: file, stringToWrite: 'Dumelang, Africa!'));
       },
       child: Text('Write to File: ${file.path}'),
@@ -294,12 +311,14 @@ class _HomeSreenState extends State<HomeSreen> {
   }
 
   Widget _readFromFile({required File file}) {
-    return TextButton(
-      onPressed: () {
-        homeBloc.add(ReadFromFileEvent(file: file));
-      },
-      child: Text('Read from File: ${file.path}'),
-    );
+    return kIsWeb
+        ? Container()
+        : TextButton(
+            onPressed: () {
+              readWriteFileBloc.add(ReadFromFileEvent(file: file));
+            },
+            child: Text('Read from File: ${file.path}'),
+          );
   }
 
   Widget _frostySampleWidget() {
