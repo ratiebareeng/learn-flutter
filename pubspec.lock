@@ -4,7 +4,7 @@ packages:
   appliation_resources:
     dependency: transitive
     description:
-      path: "../../../../code/V1.0.0.1/Components/Controller/appliation_resources"
+      path: "../../../../code/flutter/V1.0.0.1/Components/Controller/appliation_resources"
       relative: true
     source: path
     version: "0.0.1+1"
@@ -53,7 +53,7 @@ packages:
   bloc_manager:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/View/bloc_manager"
+      path: "C:/code/flutter/V1.0.0.1/Components/View/bloc_manager"
       relative: false
     source: path
     version: "0.0.1"
@@ -123,7 +123,7 @@ packages:
   data_representations:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/View/data_representations"
+      path: "C:/code/flutter/V1.0.0.1/Components/View/data_representations"
       relative: false
     source: path
     version: "0.0.1"
@@ -151,7 +151,7 @@ packages:
   dtl_connector:
     dependency: transitive
     description:
-      path: "../../../../code/V1.0.0.1/Components/Model/dtl_connector"
+      path: "../../../../code/flutter/V1.0.0.1/Components/Model/dtl_connector"
       relative: true
     source: path
     version: "0.0.1+1"
@@ -315,13 +315,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
-  logging:
-    dependency: "direct main"
-    description:
-      name: logging
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.0"
   lottie:
     dependency: transitive
     description:
@@ -549,14 +542,14 @@ packages:
   session_manager:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/View/session_manager"
+      path: "C:/code/flutter/V1.0.0.1/Components/View/session_manager"
       relative: false
     source: path
     version: "0.0.1"
   settings_manager:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/View/settings_manager"
+      path: "C:/code/flutter/V1.0.0.1/Components/View/settings_manager"
       relative: false
     source: path
     version: "0.0.1"
@@ -642,6 +635,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  synchronized:
+    dependency: "direct main"
+    description:
+      name: synchronized
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.0+3"
   term_glyph:
     dependency: transitive
     description:
@@ -659,28 +659,28 @@ packages:
   tft_devices:
     dependency: transitive
     description:
-      path: "../../../../code/V1.0.0.1/Components/Controller/tft_devices"
+      path: "../../../../code/flutter/V1.0.0.1/Components/Controller/tft_devices"
       relative: true
     source: path
     version: "0.0.1"
   tft_localizations:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/Model/tft_localizations"
+      path: "C:/code/flutter/V1.0.0.1/Components/Model/tft_localizations"
       relative: false
     source: path
     version: "0.0.1"
   tft_theme:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/Controller/tft_theme"
+      path: "C:/code/flutter/V1.0.0.1/Components/Controller/tft_theme"
       relative: false
     source: path
     version: "0.0.1+1"
   tft_widgets:
     dependency: "direct main"
     description:
-      path: "C:/code/V1.0.0.1/Components/Controller/tft_widgets"
+      path: "C:/code/flutter/V1.0.0.1/Components/Controller/tft_widgets"
       relative: false
     source: path
     version: "0.0.1"

@@ -28,23 +28,28 @@ class GetFileRefFromDocsDirEvent extends ReadWriteFileEvent {
 
 /// write to file
 class WriteToFileEvent extends ReadWriteFileEvent {
-  final File file;
+  final String fileName;
   final String stringToWrite;
 
-  const WriteToFileEvent({required this.file, required this.stringToWrite});
+  const WriteToFileEvent({required this.fileName, required this.stringToWrite});
 
   @override
-  List<Object?> get props => [file, stringToWrite];
+  List<Object?> get props => [fileName, stringToWrite];
 }
 
 /// read from file
 class ReadFromFileEvent extends ReadWriteFileEvent {
-  final File file;
+  final String fileName;
 
   const ReadFromFileEvent({
-    required this.file,
+    required this.fileName,
   });
 
   @override
-  List<Object?> get props => [file];
+  List<Object?> get props => [fileName];
+}
+
+class ResetDataEvent extends ReadWriteFileEvent {
+  @override
+  List<Object?> get props => [];
 }

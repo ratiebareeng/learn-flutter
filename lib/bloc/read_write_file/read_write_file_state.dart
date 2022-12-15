@@ -35,15 +35,14 @@ class ErrorGetDocsDirState extends ReadWriteFileState {
 }
 
 /// after you have successfully created a reference
-/// to the file path in documents directory
+/// to the file path in documents directory, takes dynamic file name
 class SuccessCreateFileInDocsDirState extends ReadWriteFileState {
-  final File file;
+  final String fileName;
 
-  const SuccessCreateFileInDocsDirState({required this.file});
+  const SuccessCreateFileInDocsDirState({required this.fileName});
 
   @override
-  // TODO: implement props
-  List<Object?> get props => [file];
+  List<Object?> get props => [fileName];
 }
 
 /// if there's an error creating a reference to the file in doc dir
@@ -58,11 +57,11 @@ class ErrorCreateFileInDocsDirState extends ReadWriteFileState {
 
 /// write data to file
 class SuccessWriteDataToFile extends ReadWriteFileState {
-  final File file;
+  final String fileName;
 
-  const SuccessWriteDataToFile({required this.file});
+  const SuccessWriteDataToFile({required this.fileName});
   @override
-  List<Object?> get props => [file];
+  List<Object?> get props => [fileName];
 }
 
 /// error writing to file

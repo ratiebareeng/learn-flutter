@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
@@ -13,6 +14,14 @@ class ReadWriteFileBloc extends Bloc<ReadWriteFileEvent, ReadWriteFileState> {
     on<GetFileRefFromDocsDirEvent>(_getFileRefFromDocsDir);
     on<WriteToFileEvent>(_writeToFile);
     on<ReadFromFileEvent>(_readFromFile);
+    on<ResetDataEvent>(_reset);
+  }
+
+  void _reset(
+    ResetDataEvent event,
+    Emitter emitter,
+  ) {
+    emitter(ReadWriteFileInitial());
   }
 
   /// get documents directory
@@ -22,7 +31,7 @@ class ReadWriteFileBloc extends Bloc<ReadWriteFileEvent, ReadWriteFileState> {
   ) async {
     try {
       emitter(ReadWriteFileInitial());
-      final Directory directory = await getApplicationDocumentsDirectory();
+      final Directory directory = await getDocumentsDirectory();
 
       emitter(HomeSuccessfulGetDocsDirState(path: directory.path));
     } on MissingPlatformDirectoryException catch (e) {
@@ -35,9 +44,8 @@ class ReadWriteFileBloc extends Bloc<ReadWriteFileEvent, ReadWriteFileState> {
     GetFileRefFromDocsDirEvent event,
     Emitter<ReadWriteFileState> emitter,
   ) async {
-    final path = event.documentsDirectory;
     emitter(SuccessCreateFileInDocsDirState(
-        file: File('$path/${event.fileName}.${event.fileExtension}')));
+        fileName: '${event.fileName}.${event.fileExtension}'));
   }
 
   /// write data to file
@@ -45,13 +53,18 @@ class ReadWriteFileBloc extends Bloc<ReadWriteFileEvent, ReadWriteFileState> {
     WriteToFileEvent event,
     Emitter<ReadWriteFileState> emitter,
   ) async {
+    final Directory directory = await getDocumentsDirectory();
+    final File fileToWrite = File('${directory.path}/${event.fileName}');
     // read file
-    await event.file
-        .writeAsString(event.stringToWrite, mode: FileMode.append)
-        .catchError((error) {
-      emitter(ErrorWriteDataToFile(errorMessage: error.toString()));
-    });
-    emitter(SuccessWriteDataToFile(file: event.file));
+    try {
+      await fileToWrite.writeAsString(event.stringToWrite,
+          mode: FileMode.append);
+      emitter(SuccessWriteDataToFile(fileName: event.fileName));
+      log('_writeToFile: ${event.stringToWrite}');
+    } catch (e) {
+      log('_writeToFile: ${e.toString()}');
+      emitter(ErrorWriteDataToFile(errorMessage: e.toString()));
+    }
   }
 
   /// read data from file
@@ -60,9 +73,27 @@ class ReadWriteFileBloc extends Bloc<ReadWriteFileEvent, ReadWriteFileState> {
     Emitter<ReadWriteFileState> emitter,
   ) async {
     // read file
-    String contents = await event.file.readAsString().catchError((error) {
-      emitter(ErrorReadFromFile(errorMessage: error.toString()));
-    });
-    emitter(SuccessReadFromFile(contents: contents));
+    /// 1. get documents dir,
+    emitter(ReadWriteFileInitial());
+    final Directory directory = await getDocumentsDirectory();
+    log(directory.path);
+    String filePath = '${directory.path}/${event.fileName}';
+
+    if (Platform.isWindows) {
+      filePath = filePath.replaceAll('/', '\\');
+    }
+
+    ///  2. get reference to file
+    try {
+      String contents = await File(filePath).readAsString();
+      emitter(SuccessReadFromFile(contents: contents));
+      log('contents: $contents');
+    } on FileSystemException catch (e) {
+      log('_readFromFile: ${e.toString()}');
+      emitter(ErrorReadFromFile(errorMessage: e.message));
+    }
   }
 }
+
+Future<Directory> getDocumentsDirectory() async =>
+    await getApplicationDocumentsDirectory();

@@ -1,37 +1,28 @@
-import 'dart:io';
-import 'dart:ui';
+// ignore_for_file: unnecessary_string_escapes
 
-import 'package:bloc_manager/blocs/blocs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logging/logging.dart';
 import 'package:settings_manager/controller/settings_controller.dart';
 import 'package:test_bloc_flutter/bloc/home_bloc/home_bloc.dart';
 import 'package:test_bloc_flutter/bloc/home_bloc/home_event.dart';
 import 'package:test_bloc_flutter/bloc/home_bloc/home_state.dart';
-import 'package:test_bloc_flutter/log_settings.dart';
 import 'package:test_bloc_flutter/show_side.dart';
 import 'package:tft_theme/tft_theme.dart';
 import 'package:tft_widgets/tft_application/tft_application_widget.dart';
 
 import 'bloc/read_write_file/read_write_file_bloc.dart';
+import 'logging/log.dart';
+import 'logging/log_settings.dart';
 import 'model/food.dart';
 
-void main() {
-  setUpLog();
-
-  var logger = Logger('ALogger');
-  logger.info('We are logging to file');
+void main() async {
+  setUpLog(logFileName: 'tft_log');
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => HomeBloc()),
         BlocProvider(create: (context) => ReadWriteFileBloc()),
-        BlocProvider(create: (context) => ApplicationBloc.instance),
-        BlocProvider(create: (context) => CaptureFingerprintBloc.instance),
-        BlocProvider(create: (context) => CapturePhotoBloc.instance),
-        BlocProvider(create: (context) => CaptureSignatureBloc.instance),
       ],
       child: const HomeSreen(),
     ),
@@ -59,7 +50,7 @@ class _HomeSreenState extends State<HomeSreen> {
   Widget _fetchDataButton() {
     return Center(
       child: ElevatedButton(
-        child: const Text("Fetch Data"),
+        child: const Text('Fetch Data'),
         onPressed: () {
           homeBloc.add(FetchDataEvent());
         },
@@ -155,6 +146,7 @@ class _HomeSreenState extends State<HomeSreen> {
             IconButton(
                 onPressed: () {
                   homeBloc.add(ResetStateEvent());
+                  readWriteFileBloc.add(ResetDataEvent());
                 },
                 icon: const Icon(Icons.refresh)),
           ],
@@ -183,7 +175,7 @@ class _HomeSreenState extends State<HomeSreen> {
                   );
                 }
                 if (state is HomeErrorFetchDataState) {
-                  return _successWidget(
+                  return _resultWidget(
                       textToDisplay: state.errorMessage,
                       sibling: _fetchDataButton());
                 }
@@ -212,45 +204,73 @@ class _HomeSreenState extends State<HomeSreen> {
                   return const Center(child: CircularProgressIndicator());
                 }*/
                 if (state is ErrorGetDocsDirState) {
-                  return _successWidget(
+                  return _resultWidget(
                       textToDisplay: state.errorMessage,
                       sibling: _getDocsDirButton());
                 }
 
                 if (state is HomeSuccessfulGetDocsDirState) {
-                  return _successWidget(
+                  return _resultWidget(
                       textToDisplay: state.path,
                       sibling: _getFileRefButton(state.path));
                 }
 
                 if (state is SuccessCreateFileInDocsDirState) {
-                  return _successWidget(
-                      textToDisplay: state.file.path,
-                      sibling: _writeToFile(file: state.file));
+                  return _resultWidget(
+                      textToDisplay: state.fileName,
+                      sibling: _writeToFile(fileName: 'tuesday.txt'));
                 }
 
                 if (state is SuccessWriteDataToFile) {
-                  return _successWidget(
+                  return _resultWidget(
                       textToDisplay: 'File Updated',
-                      sibling: _readFromFile(file: state.file));
+                      sibling: _readFromFile(fileName: 'my_counter.txt'));
                 }
 
                 if (state is SuccessReadFromFile) {
-                  return _successWidget(
+                  return _resultWidget(
                     textToDisplay: state.contents,
                   );
                 }
 
                 if (state is ErrorCreateFileInDocsDirState) {
-                  return _successWidget(textToDisplay: state.errorMessage);
+                  return _resultWidget(textToDisplay: state.errorMessage);
                 }
+
+                if (state is ErrorReadFromFile) {
+                  return _resultWidget(textToDisplay: state.errorMessage);
+                }
+
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _getDocsDirButton(),
-                    _readFromFile(
-                        file: File(
-                            '/data/user/0/com.example.test_bloc_flutter/app_flutter/my_counter.txt')),
+                    _readFromFile(fileName: 'my_counter.txt'),
+                    TextButton(
+                        onPressed: () async {
+                          /*    await Log.i(
+                            'New Logging!',
+                            className: 'main.dart',
+                            methodName: 'onPressed Write Log To File',
+                          );
+                          await Log.d(
+                            '14 December!',
+                          );
+                          await Log.e('Week 3!',
+                              overrideExisting: false,
+                              className: 'HomeSreen',
+                              methodName: 'onPressed',
+                              exception: const FormatException());
+                          await Log.w('Speak up!', false);
+                          await Log.v('This is a log message!'); */
+                          await Log.v('Verbose');
+                          await Log.i('Info');
+                          await Log.d('Debug');
+                          await Log.e('Error');
+                          await Log.w('Warn');
+                          await Log.f('Fatal');
+                        },
+                        child: const Text('Write Log To File'))
                   ],
                 );
               },
@@ -263,7 +283,7 @@ class _HomeSreenState extends State<HomeSreen> {
   }
 
   /// success widget
-  Widget _successWidget({required String textToDisplay, Widget? sibling}) {
+  Widget _resultWidget({required String textToDisplay, Widget? sibling}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -300,55 +320,27 @@ class _HomeSreenState extends State<HomeSreen> {
           );
   }
 
-  Widget _writeToFile({required File file}) {
+  Widget _writeToFile({required String fileName}) {
     return TextButton(
-      onPressed: () {
-        readWriteFileBloc.add(
-            WriteToFileEvent(file: file, stringToWrite: 'Dumelang, Africa!'));
+      onPressed: () async {
+        Log.i('writing to file');
+        readWriteFileBloc.add(WriteToFileEvent(
+            fileName: fileName,
+            stringToWrite: DateTime.now().toIso8601String()));
       },
-      child: Text('Write to File: ${file.path}'),
+      child: Text('Write to File: $fileName'),
     );
   }
 
-  Widget _readFromFile({required File file}) {
+  Widget _readFromFile({required String fileName}) {
     return kIsWeb
-        ? Container()
+        ? const Text('Web Not Available')
         : TextButton(
             onPressed: () {
-              readWriteFileBloc.add(ReadFromFileEvent(file: file));
+              readWriteFileBloc.add(ReadFromFileEvent(fileName: fileName));
             },
-            child: Text('Read from File: ${file.path}'),
+            child: Text('Read from File: $fileName'),
           );
-  }
-
-  Widget _frostySampleWidget() {
-    return Scaffold(
-      backgroundColor: Colors.amber,
-      body: Stack(
-        children: <Widget>[
-          /*new ConstrainedBox(
-              constraints: const BoxConstraints.expand(),
-              child: new FlutterLogo()
-          ),*/
-          Center(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  width: 200.0,
-                  height: 200.0,
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200.withOpacity(0.5)),
-                  child: const Center(
-                    child: Text('Frosted', style: TextStyle()),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -367,10 +359,6 @@ class _HomeSreenState extends State<HomeSreen> {
           component: _mainComponent(),
           routeName: '/',
         ),
-        RouteDataDTO(
-          component: _frostySampleWidget(),
-          routeName: '/frosty',
-        )
       ],
     );
   }
