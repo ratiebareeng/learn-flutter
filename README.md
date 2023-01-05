@@ -1,12 +1,16 @@
 # learn_flutter
 
-A new Flutter project.
+This project is a place for me to learn and practice writing
+Flutter code
 
 ## Getting Started
 
-This project is a place for me to learn and practice writing 
-Flutter code
+Week 2 [5-9/12/22]:
+Bloc Pattern
+Read/Write Files
 
-Week 3 [11-17/12/22]:
-Bloc Pattern:
+Week 4 [11-17/12/22]:
+Log to File
+WebSockets
 
+Week 4 [11-17/12/22]:

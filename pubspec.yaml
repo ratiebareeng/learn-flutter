@@ -31,20 +31,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tft_widgets:
-    path: C:/code/flutter/V1.0.0.1/Components/Controller/tft_widgets
-  session_manager:
-    path: C:/code/flutter/V1.0.0.1/Components/View/session_manager
-  tft_localizations:
-    path: C:/code/flutter/V1.0.0.1/Components/Model/tft_localizations
-  data_representations:
-    path: C:/code/flutter/V1.0.0.1/Components/View/data_representations
-  bloc_manager:
-    path: C:/code/flutter/V1.0.0.1/Components/View/bloc_manager
-  tft_theme:
-    path: C:/code/flutter/V1.0.0.1/Components/Controller/tft_theme
-  settings_manager:
-    path: C:/code/flutter/V1.0.0.1/Components/View/settings_manager
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
   path_provider: ^2.0.11
@@ -56,6 +42,9 @@ dependencies:
   #logging: ^1.1.0
   #logger: ^1.1.0
   synchronized: ^3.0.0+3
+  web_socket_channel: ^2.2.0
+  another_flushbar: ^1.12.29
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -80,9 +69,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -5,17 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_bloc_flutter/bloc/home_bloc/home_bloc.dart';
 import 'package:test_bloc_flutter/bloc/web_socket_bloc/web_socket_bloc.dart';
 import 'package:test_bloc_flutter/ui/fetch_data/fetch_data.dart';
-import 'package:test_bloc_flutter/ui/navigate_x_page.dart';
 import 'package:test_bloc_flutter/ui/read_write_file/read_write_file.dart';
 import 'package:test_bloc_flutter/ui/web_socket/web_socket_page.dart';
 
 import 'bloc/home_bloc/home_event.dart';
 import 'bloc/read_write_file/read_write_file_bloc.dart';
-import 'extensions/navigator_extension.dart';
 import 'logging/log_settings.dart';
 
 void main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   setUpLog(logFileName: 'tft_log');
   runApp(
     MultiBlocProvider(
@@ -24,10 +22,7 @@ void main() async {
         BlocProvider(create: (context) => ReadWriteFileBloc()),
         BlocProvider(create: (context) => WebSocketBloc()),
       ],
-      child: MaterialApp(
-        home: const HomeSreen(),
-        routes: {'/testX': (context) => const TestX()},
-      ),
+      child: const MaterialApp(home: HomeSreen()),
     ),
   );
 }
@@ -42,6 +37,7 @@ class HomeSreen extends StatefulWidget {
 class _HomeSreenState extends State<HomeSreen> {
   late ReadWriteFileBloc readWriteFileBloc;
   late HomeBloc homeBloc;
+  final GlobalKey<NavigatorState> _navigator = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -90,27 +86,20 @@ class _HomeSreenState extends State<HomeSreen> {
                 context: buildContext),
             TextButton(
               onPressed: () {
-                /*  Navigator.push(
+                Navigator.push(
                   buildContext,
                   MaterialPageRoute(
                     builder: (buildContext) => const FetchDataWidget(),
                   ),
-                ); */
-
-                // test navigator extension
-                NavigatorJsonExtension.pushNamedRouteFromJson(
-                  context,
-                  '{"route": "/testX", "arguments": {"year": "2023"}}',
                 );
               },
-              child: const Text('Home BlocX'),
+              child: const Text('Home Bloc'),
             ),
             // read write bloc
             _navigate(
                 pageName: 'Read Write File',
                 page: const ReadWriteFile(),
                 context: buildContext),
-
             // websocket bloc
           ],
         ),
@@ -158,26 +147,25 @@ class _HomeSreenState extends State<HomeSreen> {
               page: const WebSocketPage(),
               context: context,
             ),
-            TextButton(
-              onPressed: () {
-                /*  Navigator.push(
-                  buildContext,
-                  MaterialPageRoute(
-                    builder: (buildContext) => const FetchDataWidget(),
-                  ),
-                ); */
-
-                // test navigator extension
-                NavigatorJsonExtension.pushNamedRouteFromJson(
-                  context,
-                  '{"route": "/testX", "arguments": {"year": "2023"}}',
-                );
-              },
-              child: const Text('NavigatorX'),
-            ),
           ],
         ),
       ),
     );
+    /*  return TFTApplication(
+      onLoadApp: () {
+        SettingsController.instance.loadSettings();
+      },
+      systemTheme: ThemeMode.light,
+      appTheme: ThemeData(useMaterial3: false, colorScheme: lightColorScheme),
+      appDarkTheme:
+          ThemeData(useMaterial3: false, colorScheme: darkColorScheme),
+      appTitle: 'Test Bloc Flutter',
+      routes: [
+        RouteDataDTO(
+          component: _mainComponent(context),
+          routeName: '/',
+        ),
+      ],
+    ); */
   }
 }

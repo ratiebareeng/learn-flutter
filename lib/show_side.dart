@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'glass_morph/side_bar.dart';
-
 class ShowSide extends StatelessWidget {
   const ShowSide({Key? key}) : super(key: key);
 
@@ -32,7 +30,7 @@ class ShowSide extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.5),
                   ),
-                  child: const SideMenu2()))
+                  child: const Text('No menu')))
         ],
       ),
     );

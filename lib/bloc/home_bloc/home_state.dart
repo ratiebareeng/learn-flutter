@@ -12,7 +12,6 @@ class HomeInitialState extends HomeState {
   const HomeInitialState();
 
   @override
-  // TODO: implement props
   List<Object?> get props => [];
 }
 
@@ -31,7 +30,6 @@ class HomeErrorFetchDataState extends HomeState {
   const HomeErrorFetchDataState({required this.errorMessage});
 
   @override
-  // TODO: implement props
   List<Object?> get props => [errorMessage];
 }
 
