@@ -14,3 +14,6 @@ Log to File
 WebSockets
 
 Week 4 [11-17/12/22]:
+
+Week 6 [3-6/1/23]
+Animations
