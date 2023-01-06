@@ -8,6 +8,8 @@ import 'package:test_bloc_flutter/ui/fetch_data/fetch_data.dart';
 import 'package:test_bloc_flutter/ui/navigate_x_page.dart';
 import 'package:test_bloc_flutter/ui/read_write_file/read_write_file.dart';
 import 'package:test_bloc_flutter/ui/web_socket/web_socket_page.dart';
+import 'package:test_bloc_flutter/ui/widgets/advanced_animation.dart';
+import 'package:test_bloc_flutter/ui/widgets/basic_animation_page.dart';
 
 import 'bloc/home_bloc/home_event.dart';
 import 'bloc/read_write_file/read_write_file_bloc.dart';
@@ -15,7 +17,6 @@ import 'extensions/navigator_extension.dart';
 import 'logging/log_settings.dart';
 
 void main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
   setUpLog(logFileName: 'tft_log');
   runApp(
     MultiBlocProvider(
@@ -26,7 +27,11 @@ void main() async {
       ],
       child: MaterialApp(
         home: const HomeSreen(),
-        routes: {'/testX': (context) => const TestX()},
+        routes: {
+          '/testX': (context) => const TestX(),
+          '/basic-anim': (context) => const AnimationPage(),
+          '/adv-anim': (context) => const AdvancedAnimationPage(),
+        },
       ),
     ),
   );
@@ -60,61 +65,6 @@ class _HomeSreenState extends State<HomeSreen> {
         Navigator.push(context, MaterialPageRoute(builder: (context) => page));
       },
       child: Text(pageName),
-    );
-  }
-
-  Widget _mainComponent(buildContext) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Bloc App"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                homeBloc.add(ResetStateEvent());
-                readWriteFileBloc.add(ResetDataEvent());
-              },
-              icon: const Icon(Icons.refresh)),
-        ],
-      ),
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // home bloc
-            _navigate(
-                pageName: 'Home Bloc',
-                page: const FetchDataWidget(),
-                context: buildContext),
-            TextButton(
-              onPressed: () {
-                /*  Navigator.push(
-                  buildContext,
-                  MaterialPageRoute(
-                    builder: (buildContext) => const FetchDataWidget(),
-                  ),
-                ); */
-
-                // test navigator extension
-                NavigatorJsonExtension.pushNamedRouteFromJson(
-                  context,
-                  '{"route": "/testX", "arguments": {"year": "2023"}}',
-                );
-              },
-              child: const Text('Home BlocX'),
-            ),
-            // read write bloc
-            _navigate(
-                pageName: 'Read Write File',
-                page: const ReadWriteFile(),
-                context: buildContext),
-
-            // websocket bloc
-          ],
-        ),
-      ),
     );
   }
 
@@ -160,15 +110,8 @@ class _HomeSreenState extends State<HomeSreen> {
             ),
             TextButton(
               onPressed: () {
-                /*  Navigator.push(
-                  buildContext,
-                  MaterialPageRoute(
-                    builder: (buildContext) => const FetchDataWidget(),
-                  ),
-                ); */
-
-                // test navigator extension
-                NavigatorJsonExtension.pushNamedRouteFromJson(
+                // navigator extension
+                NavigatorJsonX.pushNamedRouteFromJson(
                   context,
                   '{"route": "/testX", "arguments": {"year": "2023"}}',
                 );
