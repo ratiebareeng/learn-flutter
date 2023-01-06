@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_bloc_flutter/ui/widgets/basic_animation_page.dart';
+import 'package:test_bloc_flutter/extensions/navigator_extension.dart';
 
 class TestX extends StatelessWidget {
   const TestX({super.key});
@@ -12,6 +12,24 @@ class TestX extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Test NavigatorX'),
         ),
-        body: const AnimationPage());
+        body: Column(
+          children: [
+            TextButton(
+              onPressed: (() {
+                NavigatorJsonX.pushNamedRouteFromJson(
+                    context, '{"route":"/basic-anim"}');
+              }),
+              child: const Text('Basic Animation'),
+            ),
+            TextButton(
+              onPressed: (() {
+                NavigatorJsonX.pushNamedRouteFromJson(
+                    context, '{"route":"/adv-anim"}');
+              }),
+              child: const Text('Advanced Animation'),
+            ),
+            // const AdvancedAnimationPage(),
+          ],
+        ));
   }
 }
