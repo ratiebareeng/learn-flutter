@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_bloc_flutter/bloc/home_bloc/home_bloc.dart';
 import 'package:test_bloc_flutter/bloc/web_socket_bloc/web_socket_bloc.dart';
+import 'package:test_bloc_flutter/extensions/random_extenstion.dart';
 import 'package:test_bloc_flutter/ui/fetch_data/fetch_data.dart';
 import 'package:test_bloc_flutter/ui/navigate_x_page.dart';
+import 'package:test_bloc_flutter/ui/pdfs/pdf_page.dart';
 import 'package:test_bloc_flutter/ui/read_write_file/read_write_file.dart';
 import 'package:test_bloc_flutter/ui/web_socket/web_socket_page.dart';
 import 'package:test_bloc_flutter/ui/widgets/advanced_animation.dart';
@@ -14,10 +16,13 @@ import 'package:test_bloc_flutter/ui/widgets/basic_animation_page.dart';
 import 'bloc/home_bloc/home_event.dart';
 import 'bloc/read_write_file/read_write_file_bloc.dart';
 import 'extensions/navigator_extension.dart';
+import 'logging/log_settings.dart' as myLog;
 import 'logging/log_settings.dart';
 
 void main() async {
-  setUpLog(logFileName: 'tft_log');
+  myLog.setUpLog(logFileName: 'tft_log');
+  sendErrorReportToBackend(true);
+
   runApp(
     MultiBlocProvider(
       providers: [
@@ -31,6 +36,7 @@ void main() async {
           '/testX': (context) => const TestX(),
           '/basic-anim': (context) => const AnimationPage(),
           '/adv-anim': (context) => const AdvancedAnimationPage(),
+          '/pdf': (context) => const PdfPage(),
         },
       ),
     ),
@@ -59,14 +65,14 @@ class _HomeSreenState extends State<HomeSreen> {
     required String pageName,
     required Widget page,
     required BuildContext context,
-  }) {
-    return TextButton(
-      onPressed: () async {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-      },
-      child: Text(pageName),
-    );
-  }
+  }) =>
+      TextButton(
+        onPressed: () async {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => page));
+        },
+        child: Text(pageName),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -110,13 +116,24 @@ class _HomeSreenState extends State<HomeSreen> {
             ),
             TextButton(
               onPressed: () {
+                reportError();
+                // navigator extension
+                /* NavigatorJsonX.pushNamedRouteFromJson(
+                  context,
+                  '{"route": "/testX", "arguments": {"year": "2023"}}',
+                ); */
+              },
+              child: const Text('NavigatorX'),
+            ),
+            TextButton(
+              onPressed: () {
                 // navigator extension
                 NavigatorJsonX.pushNamedRouteFromJson(
                   context,
-                  '{"route": "/testX", "arguments": {"year": "2023"}}',
+                  '{"route": "/pdf"}',
                 );
               },
-              child: const Text('NavigatorX'),
+              child: const Text('PDF'),
             ),
           ],
         ),

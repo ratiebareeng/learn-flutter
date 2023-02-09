@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:developer';
 
 import 'package:test_bloc_flutter/logging/file_printer.dart';
 
@@ -71,6 +72,7 @@ class Log {
     StackTrace? stacktrace,
     bool overrideExisting = false,
   }) async {
+    log('$message ${DateTime.now().toString()}');
     return _filePrinter.logToFile(
       event: LogEvent(
         overrideExisting: overrideExisting,
